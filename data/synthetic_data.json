@@ -1,0 +1,632 @@
+{
+  "prospects": [
+    {
+      "id": "p001",
+      "name": "Vikram Sharma",
+      "company": "TechCorp India",
+      "role": "VP Sales",
+      "deal_size": "₹12L",
+      "city": "Bangalore"
+    },
+    {
+      "id": "p002",
+      "name": "Priya Mehta",
+      "company": "FinanceFirst Ltd",
+      "role": "CTO",
+      "deal_size": "₹25L",
+      "city": "Mumbai"
+    },
+    {
+      "id": "p003",
+      "name": "Rajesh Kumar",
+      "company": "LogiTech Solutions",
+      "role": "CEO",
+      "deal_size": "₹8L",
+      "city": "Delhi"
+    },
+    {
+      "id": "p004",
+      "name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "role": "Head of Operations",
+      "deal_size": "₹50L",
+      "city": "Hyderabad"
+    },
+    {
+      "id": "p005",
+      "name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "role": "Founder",
+      "deal_size": "₹5L",
+      "city": "Chennai"
+    },
+    {
+      "id": "p006",
+      "name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "role": "Director IT",
+      "deal_size": "₹18L",
+      "city": "Pune"
+    },
+    {
+      "id": "p007",
+      "name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "role": "COO",
+      "deal_size": "₹35L",
+      "city": "Ahmedabad"
+    },
+    {
+      "id": "p008",
+      "name": "Kavya Reddy",
+      "company": "AgriSmart Technologies",
+      "role": "VP Technology",
+      "deal_size": "₹15L",
+      "city": "Hyderabad"
+    },
+    {
+      "id": "p009",
+      "name": "Mohit Agarwal",
+      "company": "LegalEase India",
+      "role": "Managing Partner",
+      "deal_size": "₹20L",
+      "city": "Delhi"
+    },
+    {
+      "id": "p010",
+      "name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "role": "Head of Product",
+      "deal_size": "₹10L",
+      "city": "Bangalore"
+    }
+  ],
+  "calls": [
+    {
+      "prospect_id": "p001",
+      "prospect_name": "Vikram Sharma",
+      "company": "TechCorp India",
+      "deal_size": "₹12L",
+      "call_number": 1,
+      "notes": "Requested a pilot program for 3 months before full commitment. [VP Sales at TechCorp India, Bangalore]",
+      "objections": [
+        "Legal team needs to review data privacy clauses",
+        "Currently evaluating Salesforce as alternative"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p001",
+      "prospect_name": "Vikram Sharma",
+      "company": "TechCorp India",
+      "deal_size": "₹12L",
+      "call_number": 2,
+      "notes": "Asked about integration with their existing ERP system. [VP Sales at TechCorp India, Bangalore]",
+      "objections": [
+        "IT team needs to review integration requirements"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p001",
+      "prospect_name": "Vikram Sharma",
+      "company": "TechCorp India",
+      "deal_size": "₹12L",
+      "call_number": 3,
+      "notes": "Asked detailed questions about data security and GDPR compliance. [VP Sales at TechCorp India, Bangalore]",
+      "objections": [
+        "Had a failed CRM implementation with previous vendor",
+        "Currently evaluating Salesforce as alternative"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p002",
+      "prospect_name": "Priya Mehta",
+      "company": "FinanceFirst Ltd",
+      "deal_size": "₹25L",
+      "call_number": 1,
+      "notes": "Mentioned board meeting next month — wants proposal ready before that. [CTO at FinanceFirst Ltd, Mumbai]",
+      "objections": [
+        "Board approval required for deals above ₹10L",
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p002",
+      "prospect_name": "Priya Mehta",
+      "company": "FinanceFirst Ltd",
+      "deal_size": "₹25L",
+      "call_number": 2,
+      "notes": "Very positive about the AI features. Wants to see memory demo again. [CTO at FinanceFirst Ltd, Mumbai]",
+      "objections": [
+        "IT team needs to review integration requirements",
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p002",
+      "prospect_name": "Priya Mehta",
+      "company": "FinanceFirst Ltd",
+      "deal_size": "₹25L",
+      "call_number": 3,
+      "notes": "Mentioned their team of 50 sales reps needs better visibility into pipeline. [CTO at FinanceFirst Ltd, Mumbai]",
+      "objections": [
+        "IT team needs to review integration requirements",
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p003",
+      "prospect_name": "Rajesh Kumar",
+      "company": "LogiTech Solutions",
+      "deal_size": "₹8L",
+      "call_number": 1,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [CEO at LogiTech Solutions, Delhi]",
+      "objections": [
+        "Team not ready for change management",
+        "Budget needs CFO approval before Q3 ends"
+      ],
+      "outcome": "neutral"
+    },
+    {
+      "prospect_id": "p003",
+      "prospect_name": "Rajesh Kumar",
+      "company": "LogiTech Solutions",
+      "deal_size": "₹8L",
+      "call_number": 2,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [CEO at LogiTech Solutions, Delhi]",
+      "objections": [
+        "Team not ready for change management",
+        "Need reference customers in same industry"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p003",
+      "prospect_name": "Rajesh Kumar",
+      "company": "LogiTech Solutions",
+      "deal_size": "₹8L",
+      "call_number": 3,
+      "notes": "Asked about integration with their existing ERP system. [CEO at LogiTech Solutions, Delhi]",
+      "objections": [
+        "Need reference customers in same industry"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p004",
+      "prospect_name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "deal_size": "₹50L",
+      "call_number": 1,
+      "notes": "Positive call — asked for security whitepaper and compliance docs. [Head of Operations at HealthPlus India, Hyderabad]",
+      "objections": [
+        "Board approval required for deals above ₹10L",
+        "Budget needs CFO approval before Q3 ends"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p004",
+      "prospect_name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "deal_size": "₹50L",
+      "call_number": 2,
+      "notes": "Raised concerns about data migration timeline from their legacy system. [Head of Operations at HealthPlus India, Hyderabad]",
+      "objections": [
+        "Board approval required for deals above ₹10L",
+        "Budget needs CFO approval before Q3 ends"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p004",
+      "prospect_name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "deal_size": "₹50L",
+      "call_number": 3,
+      "notes": "Requested a pilot program for 3 months before full commitment. [Head of Operations at HealthPlus India, Hyderabad]",
+      "objections": [
+        "Legal team needs to review data privacy clauses",
+        "Budget needs CFO approval before Q3 ends"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p004",
+      "prospect_name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "deal_size": "₹50L",
+      "call_number": 4,
+      "notes": "Requested case study from a company in same industry vertical. [Head of Operations at HealthPlus India, Hyderabad]",
+      "objections": [
+        "Board approval required for deals above ₹10L"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p004",
+      "prospect_name": "Ananya Singh",
+      "company": "HealthPlus India",
+      "deal_size": "₹50L",
+      "call_number": 5,
+      "notes": "Very positive about the AI features. Wants to see memory demo again. [Head of Operations at HealthPlus India, Hyderabad]",
+      "objections": [
+        "Budget needs CFO approval before Q3 ends",
+        "Board approval required for deals above ₹10L"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p005",
+      "prospect_name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "deal_size": "₹5L",
+      "call_number": 1,
+      "notes": "Expressed strong interest in the memory features. Currently using spreadsheets to track deals. [Founder at EduTech Ventures, Chennai]",
+      "objections": [
+        "Had a failed CRM implementation with previous vendor",
+        "Currently evaluating Salesforce as alternative"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p005",
+      "prospect_name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "deal_size": "₹5L",
+      "call_number": 2,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [Founder at EduTech Ventures, Chennai]",
+      "objections": [
+        "Currently evaluating Salesforce as alternative",
+        "Board approval required for deals above ₹10L"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p005",
+      "prospect_name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "deal_size": "₹5L",
+      "call_number": 3,
+      "notes": "Frustrated with current CRM — says it takes too long to get insights. Very receptive. [Founder at EduTech Ventures, Chennai]",
+      "objections": [
+        "Currently evaluating Salesforce as alternative",
+        "Previous vendor locked them into 3-year contract"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p005",
+      "prospect_name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "deal_size": "₹5L",
+      "call_number": 4,
+      "notes": "Asked detailed questions about data security and GDPR compliance. [Founder at EduTech Ventures, Chennai]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p005",
+      "prospect_name": "Arjun Nair",
+      "company": "EduTech Ventures",
+      "deal_size": "₹5L",
+      "call_number": 5,
+      "notes": "CFO joined the call unexpectedly and asked about ROI timeline. [Founder at EduTech Ventures, Chennai]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract",
+        "Had a failed CRM implementation with previous vendor"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 1,
+      "notes": "Expressed strong interest in the memory features. Currently using spreadsheets to track deals. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Data migration from legacy system is a blocker",
+        "Concerned about implementation timeline"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 2,
+      "notes": "Had a demo with competitor last week. Said our UI is better. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract",
+        "Data migration from legacy system is a blocker"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 3,
+      "notes": "Requested case study from a company in same industry vertical. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Data migration from legacy system is a blocker",
+        "Previous vendor locked them into 3-year contract"
+      ],
+      "outcome": "neutral"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 4,
+      "notes": "Requested a pilot program for 3 months before full commitment. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract",
+        "Data migration from legacy system is a blocker"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 5,
+      "notes": "Had a demo with competitor last week. Said our UI is better. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Data migration from legacy system is a blocker",
+        "Need reference customers in same industry"
+      ],
+      "outcome": "neutral"
+    },
+    {
+      "prospect_id": "p006",
+      "prospect_name": "Deepika Joshi",
+      "company": "RetailMax Pvt Ltd",
+      "deal_size": "₹18L",
+      "call_number": 6,
+      "notes": "Asked about integration with their existing ERP system. [Director IT at RetailMax Pvt Ltd, Pune]",
+      "objections": [
+        "Concerned about implementation timeline",
+        "Need reference customers in same industry"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p007",
+      "prospect_name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "deal_size": "₹35L",
+      "call_number": 1,
+      "notes": "Raised concerns about data migration timeline from their legacy system. [COO at ManufacturePro, Ahmedabad]",
+      "objections": [
+        "Comparing pricing with Zoho CRM",
+        "Team not ready for change management"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p007",
+      "prospect_name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "deal_size": "₹35L",
+      "call_number": 2,
+      "notes": "Positive call — asked for security whitepaper and compliance docs. [COO at ManufacturePro, Ahmedabad]",
+      "objections": [
+        "Team not ready for change management"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p007",
+      "prospect_name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "deal_size": "₹35L",
+      "call_number": 3,
+      "notes": "Requested a pilot program for 3 months before full commitment. [COO at ManufacturePro, Ahmedabad]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract",
+        "Team not ready for change management"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p007",
+      "prospect_name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "deal_size": "₹35L",
+      "call_number": 4,
+      "notes": "Asked detailed questions about data security and GDPR compliance. [COO at ManufacturePro, Ahmedabad]",
+      "objections": [
+        "Team not ready for change management",
+        "Previous vendor locked them into 3-year contract"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p007",
+      "prospect_name": "Suresh Patel",
+      "company": "ManufacturePro",
+      "deal_size": "₹35L",
+      "call_number": 5,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [COO at ManufacturePro, Ahmedabad]",
+      "objections": [
+        "Team not ready for change management",
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p008",
+      "prospect_name": "Kavya Reddy",
+      "company": "AgriSmart Technologies",
+      "deal_size": "₹15L",
+      "call_number": 1,
+      "notes": "Mentioned board meeting next month — wants proposal ready before that. [VP Technology at AgriSmart Technologies, Hyderabad]",
+      "objections": [
+        "Security compliance documentation needed before signing"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p008",
+      "prospect_name": "Kavya Reddy",
+      "company": "AgriSmart Technologies",
+      "deal_size": "₹15L",
+      "call_number": 2,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [VP Technology at AgriSmart Technologies, Hyderabad]",
+      "objections": [
+        "Budget needs CFO approval before Q3 ends"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p008",
+      "prospect_name": "Kavya Reddy",
+      "company": "AgriSmart Technologies",
+      "deal_size": "₹15L",
+      "call_number": 3,
+      "notes": "Asked detailed questions about data security and GDPR compliance. [VP Technology at AgriSmart Technologies, Hyderabad]",
+      "objections": [
+        "Currently evaluating Salesforce as alternative"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p008",
+      "prospect_name": "Kavya Reddy",
+      "company": "AgriSmart Technologies",
+      "deal_size": "₹15L",
+      "call_number": 4,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [VP Technology at AgriSmart Technologies, Hyderabad]",
+      "objections": [
+        "Security compliance documentation needed before signing",
+        "Currently evaluating Salesforce as alternative"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p009",
+      "prospect_name": "Mohit Agarwal",
+      "company": "LegalEase India",
+      "deal_size": "₹20L",
+      "call_number": 1,
+      "notes": "Mentioned board meeting next month — wants proposal ready before that. [Managing Partner at LegalEase India, Delhi]",
+      "objections": [
+        "Need ROI proof with case studies from similar companies"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p009",
+      "prospect_name": "Mohit Agarwal",
+      "company": "LegalEase India",
+      "deal_size": "₹20L",
+      "call_number": 2,
+      "notes": "Requested case study from a company in same industry vertical. [Managing Partner at LegalEase India, Delhi]",
+      "objections": [
+        "Previous vendor locked them into 3-year contract"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p009",
+      "prospect_name": "Mohit Agarwal",
+      "company": "LegalEase India",
+      "deal_size": "₹20L",
+      "call_number": 3,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [Managing Partner at LegalEase India, Delhi]",
+      "objections": [
+        "Need ROI proof with case studies from similar companies"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p009",
+      "prospect_name": "Mohit Agarwal",
+      "company": "LegalEase India",
+      "deal_size": "₹20L",
+      "call_number": 4,
+      "notes": "Had a demo with competitor last week. Said our UI is better. [Managing Partner at LegalEase India, Delhi]",
+      "objections": [
+        "Need reference customers in same industry"
+      ],
+      "outcome": "needs follow-up"
+    },
+    {
+      "prospect_id": "p010",
+      "prospect_name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "deal_size": "₹10L",
+      "call_number": 1,
+      "notes": "Asked about integration with their existing ERP system. [Head of Product at TravelTech Solutions, Bangalore]",
+      "objections": [
+        "Q4 budget already allocated elsewhere",
+        "Security compliance documentation needed before signing"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p010",
+      "prospect_name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "deal_size": "₹10L",
+      "call_number": 2,
+      "notes": "Decision maker confirmed budget is approved, just needs legal sign-off. [Head of Product at TravelTech Solutions, Bangalore]",
+      "objections": [
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p010",
+      "prospect_name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "deal_size": "₹10L",
+      "call_number": 3,
+      "notes": "Had a demo with competitor last week. Said our UI is better. [Head of Product at TravelTech Solutions, Bangalore]",
+      "objections": [
+        "Comparing pricing with Zoho CRM"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p010",
+      "prospect_name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "deal_size": "₹10L",
+      "call_number": 4,
+      "notes": "Had a demo with competitor last week. Said our UI is better. [Head of Product at TravelTech Solutions, Bangalore]",
+      "objections": [
+        "Comparing pricing with Zoho CRM",
+        "Security compliance documentation needed before signing"
+      ],
+      "outcome": "positive"
+    },
+    {
+      "prospect_id": "p010",
+      "prospect_name": "Sneha Pillai",
+      "company": "TravelTech Solutions",
+      "deal_size": "₹10L",
+      "call_number": 5,
+      "notes": "Frustrated with current CRM — says it takes too long to get insights. Very receptive. [Head of Product at TravelTech Solutions, Bangalore]",
+      "objections": [
+        "Security compliance documentation needed before signing"
+      ],
+      "outcome": "needs follow-up"
+    }
+  ],
+  "total_prospects": 10,
+  "total_calls": 43
+}
