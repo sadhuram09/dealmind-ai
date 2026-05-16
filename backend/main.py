@@ -25,11 +25,9 @@ app.add_middleware(
 
 # ── Clients ─────────────────────────────────────────────
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-HINDSIGHT_BASE = "http://localhost:8888/v1/default"
+HINDSIGHT_BASE = "https://api.hindsight.vectorize.io/v1/default"
 
 # ── Dual memory store ────────────────────────────────────
-# Primary: Hindsight (persistent, semantic)
-# Fallback: In-process store (always works, resets on restart)
 local_memory: Dict[str, List[dict]] = {}
 audit_log: List[dict] = []
 
@@ -48,7 +46,13 @@ class FollowUpRequest(BaseModel):
     prospect_id: str
     call_summary: str
 
-# ── Hindsight helpers ────────────────────────────────────
+# ── Hindsight Cloud helpers ──────────────────────────────
+def get_hindsight_headers():
+    return {
+        "Authorization": f"Bearer {os.getenv('HINDSIGHT_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+
 def get_bank_id(prospect_id: str) -> str:
     return f"dealmind-{prospect_id}"
 
@@ -57,6 +61,7 @@ def hindsight_ensure_bank(bank_id: str, prospect_name: str, company: str):
         http_requests.put(
             f"{HINDSIGHT_BASE}/banks/{bank_id}",
             json={"mission": f"Sales intelligence for {prospect_name} from {company}. Track all objections, budget details, competitor mentions, and commitments."},
+            headers=get_hindsight_headers(),
             timeout=5
         )
     except:
@@ -67,6 +72,7 @@ def hindsight_store(bank_id: str, content: str):
         r = http_requests.post(
             f"{HINDSIGHT_BASE}/banks/{bank_id}/memories",
             json={"items": [{"content": content}]},
+            headers=get_hindsight_headers(),
             timeout=5
         )
         return r.status_code == 200
@@ -78,6 +84,7 @@ def hindsight_recall(bank_id: str, query: str) -> str:
         r = http_requests.post(
             f"{HINDSIGHT_BASE}/banks/{bank_id}/memories/recall",
             json={"query": query, "top_k": 10},
+            headers=get_hindsight_headers(),
             timeout=5
         )
         if r.status_code == 200:
@@ -94,6 +101,7 @@ def hindsight_reflect(bank_id: str, query: str) -> str:
         r = http_requests.post(
             f"{HINDSIGHT_BASE}/banks/{bank_id}/reflect",
             json={"query": query},
+            headers=get_hindsight_headers(),
             timeout=10
         )
         if r.status_code == 200:
@@ -103,7 +111,7 @@ def hindsight_reflect(bank_id: str, query: str) -> str:
         pass
     return ""
 
-# ── Local memory helpers (guaranteed fallback) ───────────
+# ── Local memory helpers ─────────────────────────────────
 def local_store(prospect_id: str, call_data: dict):
     if prospect_id not in local_memory:
         local_memory[prospect_id] = []
@@ -130,15 +138,15 @@ def local_recall(prospect_id: str) -> str:
 def get_best_memory(prospect_id: str, query: str = "objections budget decisions") -> str:
     bank_id = get_bank_id(prospect_id)
 
-    # Try Hindsight first (semantic search)
+    # Try Hindsight Cloud first (semantic search)
     hs_memory = hindsight_recall(bank_id, query)
     if hs_memory and len(hs_memory) > 50:
-        return f"[Hindsight Semantic Memory]\n{hs_memory}"
+        return f"[Hindsight Cloud Memory]\n{hs_memory}"
 
     # Try Hindsight reflect (most intelligent)
     hs_reflect = hindsight_reflect(bank_id, query)
     if hs_reflect and len(hs_reflect) > 50:
-        return f"[Hindsight Reflection]\n{hs_reflect}"
+        return f"[Hindsight Cloud Reflection]\n{hs_reflect}"
 
     # Fallback to local memory
     local = local_recall(prospect_id)
@@ -189,7 +197,7 @@ def ask_groq(prompt: str, system: str = "You are an elite AI sales assistant.") 
 def root():
     return {
         "status": "DealMind AI v3.0 is live 🚀",
-        "memory_primary": "Hindsight (persistent semantic)",
+        "memory_primary": "Hindsight Cloud (persistent semantic)",
         "memory_fallback": "Local store (always available)",
         "llm": "Groq llama-3.3-70b-versatile",
         "prospects_in_memory": len(local_memory)
@@ -198,7 +206,11 @@ def root():
 @app.get("/health")
 def health():
     try:
-        r = http_requests.get("http://localhost:8888/health", timeout=3)
+        r = http_requests.get(
+            "https://api.hindsight.vectorize.io/health",
+            headers=get_hindsight_headers(),
+            timeout=3
+        )
         hs = "connected" if r.status_code == 200 else "error"
     except:
         hs = "disconnected"
@@ -220,7 +232,6 @@ def log_call(data: CallNote):
         f"Outcome: {data.outcome}."
     )
 
-    # Store in both Hindsight AND local
     bank_id = get_bank_id(data.prospect_id)
     hindsight_ensure_bank(bank_id, data.prospect_name, data.company)
     hs_ok = hindsight_store(bank_id, content)
@@ -241,7 +252,7 @@ def log_call(data: CallNote):
         "company": data.company,
         "call_number": data.call_number,
         "bank_id": bank_id,
-        "hindsight": "✅ stored" if hs_ok else "⚠️ fallback used",
+        "hindsight": "✅ stored in cloud" if hs_ok else "⚠️ fallback used",
         "local": "✅ stored",
         "total_calls_remembered": len(local_memory.get(data.prospect_id, []))
     }
@@ -254,7 +265,7 @@ def recall(prospect_id: str, query: str = "all interactions objections budget"):
         "prospect_id": prospect_id,
         "memory": memory,
         "total_calls": local_calls,
-        "source": "Hindsight + Local dual memory"
+        "source": "Hindsight Cloud + Local dual memory"
     }
 
 @app.post("/prepare-for-call/{prospect_id}")
@@ -395,7 +406,7 @@ def get_audit_trail():
     baseline = len(audit_log) * 0.002
     saved = baseline - total
     return {
-        "entries": audit_log[-50:],  # last 50
+        "entries": audit_log[-50:],
         "summary": {
             "total_queries": len(audit_log),
             "total_cost_usd": round(total, 6),

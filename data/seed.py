@@ -2,7 +2,7 @@ import json
 import requests
 import time
 
-BASE = "http://127.0.0.1:8000"
+BASE = "https://dealmind-ai-cdkj.onrender.com"
 
 # Load the synthetic data
 with open("synthetic_data.json", "r", encoding="utf-8") as f:
