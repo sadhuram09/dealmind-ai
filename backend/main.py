@@ -13,7 +13,7 @@ from datetime import datetime
 
 load_dotenv()
 
-app = FastAPI(title="DealMind AI", version="3.0.0")
+app = FastAPI(title="DealMind AI", version="4.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,9 +27,177 @@ app.add_middleware(
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 HINDSIGHT_BASE = "https://api.hindsight.vectorize.io/v1/default"
 
-# ── Dual memory store ────────────────────────────────────
+# ── In-memory store (fast access) ────────────────────────
 local_memory: Dict[str, List[dict]] = {}
+prospect_metadata: Dict[str, dict] = {}  # permanent metadata store
 audit_log: List[dict] = []
+
+# ── Models ──────────────────────────────────────────────
+class CallNote(BaseModel):
+    prospect_id: str
+    prospect_name: str
+    company: str
+    deal_size: str
+    call_number: int
+    notes: str
+    objections: List[str]
+    outcome: str
+
+class FollowUpRequest(BaseModel):
+    prospect_id: str
+    call_summary: str
+
+# ── Hindsight Cloud helpers ──────────────────────────────
+def get_hindsight_headers():
+    return {
+        "Authorization": f"Bearer {os.getenv('HINDSIGHT_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+
+def get_bank_id(prospect_id: str) -> str:
+    return f"dealmind-{prospect_id}"
+
+def hindsight_ensure_bank(bank_id: str, prospect_name: str, company: str, deal_size: str):
+    try:
+        http_requests.put(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}",
+            json={"mission": f"Sales intelligence for {prospect_name} from {company}. Deal size: {deal_size}. Track all objections, budget details, competitor mentions, and commitments."},
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+    except:
+        pass
+
+def hindsight_store(bank_id: str, content: str):
+    try:
+        r = http_requests.post(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories",
+            json={"items": [{"content": content}]},
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+        return r.status_code == 200
+    except:
+        return False
+
+def hindsight_store_metadata(bank_id: str, metadata: dict):
+    """Store prospect metadata as a mental model in Hindsight — permanent"""
+    try:
+        content = json.dumps(metadata)
+        http_requests.post(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/mental-models",
+            json={
+                "id": "prospect_metadata",
+                "content": content,
+                "description": "Prospect structured metadata — name, company, deal size, outcomes"
+            },
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+    except:
+        pass
+
+def hindsight_get_metadata(bank_id: str) -> dict:
+    """Retrieve prospect metadata from Hindsight mental model"""
+    try:
+        r = http_requests.get(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/mental-models/prospect_metadata",
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+        if r.status_code == 200:
+            data = r.json()
+            content = data.get("content", "{}")
+            return json.loads(content)
+    except:
+        pass
+    return {}
+
+def hindsight_recall(bank_id: str, query: str) -> str:
+    try:
+        r = http_requests.post(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories/recall",
+            json={"query": query, "top_k": 10},
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+        if r.status_code == 200:
+            data = r.json()
+            results = data.get("results", [])
+            if results:
+                return "\n".join([item.get("text", "") for item in results if item.get("text")])
+    except:
+        pass
+    return ""
+
+def hindsight_reflect(bank_id: str, query: str) -> str:
+    try:
+        r = http_requests.post(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/reflect",
+            json={"query": query},
+            headers=get_hindsight_headers(),
+            timeout=10
+        )
+        if r.status_code == 200:
+            data = r.json()
+            return data.get("text", "") or data.get("response", "") or ""
+    except:
+        pass
+    return ""
+
+def hindsight_get_all_banks() -> list:
+    try:
+        r = http_requests.get(
+            f"{HINDSIGHT_BASE}/banks",
+            headers=get_hindsight_headers(),
+            timeout=5
+        )
+        if r.status_code == 200:
+            return r.json().get("banks", [])
+    except:
+        pass
+    return []
+
+# ── Local memory helpers ─────────────────────────────────
+def local_store(prospect_id: str, call_data: dict):
+    if prospect_id not in local_memory:
+        local_memory[prospect_id] = []
+    local_memory[prospect_id].append({
+        **call_data,
+        "timestamp": datetime.now().isoformat()
+    })
+
+def local_recall(prospect_id: str) -> str:
+    if prospect_id not in local_memory:
+        return ""
+    calls = local_memory[prospect_id]
+    lines = []
+    for c in calls:
+        lines.append(
+            f"Call {c['call_number']} ({c.get('timestamp','')[:10]}): "
+            f"{c['notes']} | "
+            f"Objections: {', '.join(c['objections']) if c['objections'] else 'None'} | "
+            f"Deal size: {c['deal_size']} | "
+            f"Outcome: {c['outcome']}"
+        )
+    return "\n".join(lines)
+
+def get_best_memory(prospect_id: str, query: str = "objections budget decisions") -> str:
+    bank_id = get_bank_id(prospect_id)
+
+    hs_memory = hindsight_recall(bank_id, query)
+    if hs_memory and len(hs_memory) > 50:
+        return f"[Hindsight Cloud Memory]\n{hs_memory}"
+
+    hs_reflect = hindsight_reflect(bank_id, query)
+    if hs_reflect and len(hs_reflect) > 50:
+        return f"[Hindsight Cloud Reflection]\n{hs_reflect}"
+
+    local = local_recall(prospect_id)
+    if local:
+        return f"[Local Memory]\n{local}"
+
+    return "No previous interactions found."
 
 # ── Auto-seed on startup ─────────────────────────────────
 DEMO_PROSPECTS = [
@@ -107,132 +275,18 @@ def auto_seed():
             "outcome": call_data["outcome"],
             "timestamp": datetime.now().isoformat()
         })
+        # Store metadata permanently
+        prospect_metadata[pid] = {
+            "prospect_id": pid,
+            "prospect_name": p["name"],
+            "company": p["company"],
+            "deal_size": p["deal_size"],
+            "role": p["role"],
+            "city": p["city"]
+        }
 
 auto_seed()
-print(f"✅ Auto-seeded {len(DEMO_PROSPECTS)} prospects with {len(DEMO_CALLS)} calls on startup")
-# ── Models ──────────────────────────────────────────────
-class CallNote(BaseModel):
-    prospect_id: str
-    prospect_name: str
-    company: str
-    deal_size: str
-    call_number: int
-    notes: str
-    objections: List[str]
-    outcome: str
-
-class FollowUpRequest(BaseModel):
-    prospect_id: str
-    call_summary: str
-
-# ── Hindsight Cloud helpers ──────────────────────────────
-def get_hindsight_headers():
-    return {
-        "Authorization": f"Bearer {os.getenv('HINDSIGHT_API_KEY')}",
-        "Content-Type": "application/json"
-    }
-
-def get_bank_id(prospect_id: str) -> str:
-    return f"dealmind-{prospect_id}"
-
-def hindsight_ensure_bank(bank_id: str, prospect_name: str, company: str):
-    try:
-        http_requests.put(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}",
-            json={"mission": f"Sales intelligence for {prospect_name} from {company}. Track all objections, budget details, competitor mentions, and commitments."},
-            headers=get_hindsight_headers(),
-            timeout=5
-        )
-    except:
-        pass
-
-def hindsight_store(bank_id: str, content: str):
-    try:
-        r = http_requests.post(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories",
-            json={"items": [{"content": content}]},
-            headers=get_hindsight_headers(),
-            timeout=5
-        )
-        return r.status_code == 200
-    except:
-        return False
-
-def hindsight_recall(bank_id: str, query: str) -> str:
-    try:
-        r = http_requests.post(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories/recall",
-            json={"query": query, "top_k": 10},
-            headers=get_hindsight_headers(),
-            timeout=5
-        )
-        if r.status_code == 200:
-            data = r.json()
-            results = data.get("results", [])
-            if results:
-                return "\n".join([item.get("text", "") for item in results if item.get("text")])
-    except:
-        pass
-    return ""
-
-def hindsight_reflect(bank_id: str, query: str) -> str:
-    try:
-        r = http_requests.post(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}/reflect",
-            json={"query": query},
-            headers=get_hindsight_headers(),
-            timeout=10
-        )
-        if r.status_code == 200:
-            data = r.json()
-            return data.get("text", "") or data.get("response", "") or ""
-    except:
-        pass
-    return ""
-
-# ── Local memory helpers ─────────────────────────────────
-def local_store(prospect_id: str, call_data: dict):
-    if prospect_id not in local_memory:
-        local_memory[prospect_id] = []
-    local_memory[prospect_id].append({
-        **call_data,
-        "timestamp": datetime.now().isoformat()
-    })
-
-def local_recall(prospect_id: str) -> str:
-    if prospect_id not in local_memory:
-        return ""
-    calls = local_memory[prospect_id]
-    lines = []
-    for c in calls:
-        lines.append(
-            f"Call {c['call_number']} ({c.get('timestamp','')[:10]}): "
-            f"{c['notes']} | "
-            f"Objections: {', '.join(c['objections']) if c['objections'] else 'None'} | "
-            f"Deal size: {c['deal_size']} | "
-            f"Outcome: {c['outcome']}"
-        )
-    return "\n".join(lines)
-
-def get_best_memory(prospect_id: str, query: str = "objections budget decisions") -> str:
-    bank_id = get_bank_id(prospect_id)
-
-    # Try Hindsight Cloud first (semantic search)
-    hs_memory = hindsight_recall(bank_id, query)
-    if hs_memory and len(hs_memory) > 50:
-        return f"[Hindsight Cloud Memory]\n{hs_memory}"
-
-    # Try Hindsight reflect (most intelligent)
-    hs_reflect = hindsight_reflect(bank_id, query)
-    if hs_reflect and len(hs_reflect) > 50:
-        return f"[Hindsight Cloud Reflection]\n{hs_reflect}"
-
-    # Fallback to local memory
-    local = local_recall(prospect_id)
-    if local:
-        return f"[Local Memory]\n{local}"
-
-    return "No previous interactions found."
+print(f"✅ Auto-seeded {len(DEMO_PROSPECTS)} prospects on startup")
 
 # ── Groq AI helper ───────────────────────────────────────
 def ask_groq(prompt: str, system: str = "You are an elite AI sales assistant.") -> dict:
@@ -275,7 +329,7 @@ def ask_groq(prompt: str, system: str = "You are an elite AI sales assistant.") 
 @app.get("/")
 def root():
     return {
-        "status": "DealMind AI v3.0 is live 🚀",
+        "status": "DealMind AI v4.0 is live 🚀",
         "memory_primary": "Hindsight Cloud (persistent semantic)",
         "memory_fallback": "Local store (always available)",
         "llm": "Groq llama-3.3-70b-versatile",
@@ -286,13 +340,13 @@ def root():
 def health():
     try:
         r = http_requests.get(
-            "https://api.hindsight.vectorize.io/health",
+            f"{HINDSIGHT_BASE}/banks",
             headers=get_hindsight_headers(),
             timeout=3
         )
-        hs = "connected" if r.status_code == 200 else "error"
-    except:
-        hs = "disconnected"
+        hs = "connected" if r.status_code == 200 else f"error-{r.status_code}"
+    except Exception as e:
+        hs = f"disconnected"
     return {
         "status": "ok",
         "hindsight": hs,
@@ -312,8 +366,20 @@ def log_call(data: CallNote):
     )
 
     bank_id = get_bank_id(data.prospect_id)
-    hindsight_ensure_bank(bank_id, data.prospect_name, data.company)
+    hindsight_ensure_bank(bank_id, data.prospect_name, data.company, data.deal_size)
     hs_ok = hindsight_store(bank_id, content)
+
+    # Store metadata permanently in Hindsight
+    meta = {
+        "prospect_id": data.prospect_id,
+        "prospect_name": data.prospect_name,
+        "company": data.company,
+        "deal_size": data.deal_size,
+        "last_outcome": data.outcome,
+        "last_updated": datetime.now().isoformat()
+    }
+    hindsight_store_metadata(bank_id, meta)
+    prospect_metadata[data.prospect_id] = meta
 
     local_store(data.prospect_id, {
         "prospect_name": data.prospect_name,
@@ -498,7 +564,10 @@ def get_audit_trail():
 
 @app.get("/prospects")
 def get_prospects():
+    # Build from local memory + prospect_metadata (auto-seeded on startup)
     prospects = []
+
+    # First add all from local memory
     for pid, calls in local_memory.items():
         if not calls:
             continue
@@ -506,6 +575,8 @@ def get_prospects():
         all_objections = []
         for c in calls:
             all_objections.extend(c.get("objections", []))
+
+        meta = prospect_metadata.get(pid, {})
         prospects.append({
             "prospect_id": pid,
             "prospect_name": latest["prospect_name"],
@@ -514,6 +585,36 @@ def get_prospects():
             "total_calls": len(calls),
             "last_outcome": latest["outcome"],
             "all_objections": list(set(all_objections)),
-            "bank_id": get_bank_id(pid)
+            "bank_id": get_bank_id(pid),
+            "role": meta.get("role", ""),
+            "city": meta.get("city", "")
         })
+
+    # Then check Hindsight Cloud for any prospects not in local memory
+    try:
+        banks = hindsight_get_all_banks()
+        local_ids = set(local_memory.keys())
+        for bank in banks:
+            bid = bank.get("id", "")
+            if bid.startswith("dealmind-"):
+                pid = bid.replace("dealmind-", "")
+                if pid not in local_ids:
+                    # Get metadata from Hindsight
+                    meta = hindsight_get_metadata(bid)
+                    if meta:
+                        prospects.append({
+                            "prospect_id": pid,
+                            "prospect_name": meta.get("prospect_name", pid),
+                            "company": meta.get("company", "Unknown"),
+                            "deal_size": meta.get("deal_size", "Unknown"),
+                            "total_calls": 0,
+                            "last_outcome": meta.get("last_outcome", "unknown"),
+                            "all_objections": [],
+                            "bank_id": bid,
+                            "role": meta.get("role", ""),
+                            "city": meta.get("city", "")
+                        })
+    except:
+        pass
+
     return {"prospects": prospects, "total": len(prospects)}
