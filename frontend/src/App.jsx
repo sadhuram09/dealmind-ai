@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router
 import { Brain, Phone, Lightbulb, BarChart3, Zap, Home, Network, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
-import CustomCursor from './components/ui/CustomCursor';
 import ThemeToggle from './components/ui/ThemeToggle';
 import NotificationBell from './components/ui/NotificationBell';
 import { ScrollProgress, BackToTop, PulseRing } from './components/ui/Effects';
@@ -120,7 +119,7 @@ function NavShell({ children }) {
             className="hamburger"
             onClick={() => setMenuOpen(o => !o)}
             whileTap={{ scale: 0.9 }}
-            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, width: 34, height: 34, display: 'none', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+            style={{ background: 'rgba(26,26,36,0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.15)', borderRadius: 8, width: 34, height: 34, display: 'none', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}
           >
             {menuOpen ? <X size={16} style={{ color: 'var(--text-primary)' }} /> : <Menu size={16} style={{ color: 'var(--text-primary)' }} />}
           </motion.button>
@@ -162,7 +161,6 @@ export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <CustomCursor />
         <ScrollProgress />
         <BackToTop />
         <NavShell>

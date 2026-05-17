@@ -73,11 +73,6 @@ export default function Landing() {
 
           {/* Left: Text */}
           <motion.div variants={stagger} initial="hidden" animate="visible">
-            <motion.div variants={item} style={{ marginBottom: 24 }}>
-              <ShimmerBadge>
-                🏆 Hindsight × CascadeFlow Hackathon · Team India 🇮🇳
-              </ShimmerBadge>
-            </motion.div>
 
             <motion.h1 variants={item} style={{ fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 900, lineHeight: 1.05, marginBottom: 16, letterSpacing: '-0.03em' }}>
               <TextScramble text="Never Lose" style={{ display: 'block', color: 'var(--text-primary)' }} />
@@ -177,7 +172,15 @@ export default function Landing() {
       </section>
 
       {/* STATS STRIP */}
-      <section style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '40px 24px' }}>
+      <section style={{
+        background: 'rgba(19,19,26,0.5)',
+        backdropFilter: 'blur(20px) saturate(1.4)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+        borderTop: '1px solid rgba(139,92,246,0.1)',
+        borderBottom: '1px solid rgba(139,92,246,0.1)',
+        padding: '40px 24px',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+      }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24, textAlign: 'center' }}>
           {stats.map((s, i) => (
             <ScrollReveal key={s.label} delay={i * 0.1}>
@@ -198,45 +201,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-        <ScrollReveal>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <ShimmerBadge style={{ marginBottom: 16 }}>Platform Features</ShimmerBadge>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 12 }}>
-              Built for <GradientText>Serious Sellers</GradientText>
-            </h2>
-            <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto' }}>
-              Every feature is powered by persistent AI memory — your reps walk in knowing exactly what to say.
-            </p>
-          </div>
-        </ScrollReveal>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-          {FEATURES.map((f, i) => (
-            <ScrollReveal key={f.title} delay={i * 0.08} direction="up">
-              <GlowBorder style={{ height: '100%' }}>
-                <SpotlightCard
-                  className="card"
-                  style={{ padding: 24, height: '100%', borderRadius: 12, transition: 'transform 0.2s' }}
-                >
-                  <motion.div whileHover={{ scale: 1.015 }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 10,
-                      background: `${f.color}20`, border: `1px solid ${f.color}30`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-                    }}>
-                      <f.icon size={20} style={{ color: f.color }} />
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>{f.title}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>{f.desc}</div>
-                  </motion.div>
-                </SpotlightCard>
-              </GlowBorder>
-            </ScrollReveal>
-          ))}
-        </div>
-      </section>
 
       {/* CTA SECTION */}
       <section style={{ padding: '80px 24px', position: 'relative', overflow: 'hidden' }}>
@@ -244,9 +209,12 @@ export default function Landing() {
         <ScrollReveal direction="scale">
           <div style={{
             maxWidth: 700, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1,
-            background: 'var(--bg-surface)', border: '1px solid var(--border)',
+            background: 'rgba(19,19,26,0.5)',
+            backdropFilter: 'blur(28px) saturate(1.5)',
+            WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
+            border: '1px solid rgba(139,92,246,0.18)',
             borderRadius: 24, padding: '56px 40px',
-            boxShadow: '0 0 80px rgba(139,92,246,0.1)',
+            boxShadow: '0 0 80px rgba(139,92,246,0.12), 0 24px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
           }}>
             <ShimmerBadge style={{ marginBottom: 20 }}>Ready to Close More Deals?</ShimmerBadge>
             <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 900, marginBottom: 16, letterSpacing: '-0.02em' }}>
@@ -268,7 +236,14 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', padding: '28px 24px', textAlign: 'center' }}>
+      <footer style={{
+        borderTop: '1px solid rgba(139,92,246,0.1)',
+        background: 'rgba(13,13,18,0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        padding: '28px 24px', textAlign: 'center',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
           <Brain size={16} style={{ color: 'var(--purple)' }} />
           <span style={{ fontWeight: 700, fontSize: 14 }}>DealMind AI</span>

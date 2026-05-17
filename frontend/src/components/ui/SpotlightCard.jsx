@@ -23,15 +23,16 @@ export default function SpotlightCard({ children, className, style }) {
         <div
           style={{
             position: 'absolute',
-            left: pos.x - 150,
-            top: pos.y - 150,
-            width: 300,
-            height: 300,
+            left: pos.x - 180,
+            top: pos.y - 180,
+            width: 360,
+            height: 360,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(59,130,246,0.06) 50%, transparent 70%)',
             pointerEvents: 'none',
             zIndex: 0,
-            transition: 'opacity 0.1s',
+            transition: 'opacity 0.15s',
+            filter: 'blur(2px)',
           }}
         />
       )}
