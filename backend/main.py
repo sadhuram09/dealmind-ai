@@ -31,6 +31,85 @@ HINDSIGHT_BASE = "https://api.hindsight.vectorize.io/v1/default"
 local_memory: Dict[str, List[dict]] = {}
 audit_log: List[dict] = []
 
+# ── Auto-seed on startup ─────────────────────────────────
+DEMO_PROSPECTS = [
+    {"id": "p001", "name": "Vikram Sharma", "company": "TechCorp India", "role": "VP Sales", "deal_size": "₹12L", "city": "Bangalore"},
+    {"id": "p002", "name": "Priya Mehta", "company": "FinanceFirst Ltd", "role": "CTO", "deal_size": "₹25L", "city": "Mumbai"},
+    {"id": "p003", "name": "Rajesh Kumar", "company": "LogiTech Solutions", "role": "CEO", "deal_size": "₹8L", "city": "Delhi"},
+    {"id": "p004", "name": "Ananya Singh", "company": "HealthPlus India", "role": "Head of Operations", "deal_size": "₹50L", "city": "Hyderabad"},
+    {"id": "p005", "name": "Arjun Nair", "company": "EduTech Ventures", "role": "Founder", "deal_size": "₹5L", "city": "Chennai"},
+    {"id": "p006", "name": "Deepika Joshi", "company": "RetailMax Pvt Ltd", "role": "Director IT", "deal_size": "₹18L", "city": "Pune"},
+    {"id": "p007", "name": "Suresh Patel", "company": "ManufacturePro", "role": "COO", "deal_size": "₹35L", "city": "Ahmedabad"},
+    {"id": "p008", "name": "Kavya Reddy", "company": "AgriSmart Technologies", "role": "VP Technology", "deal_size": "₹15L", "city": "Hyderabad"},
+    {"id": "p009", "name": "Mohit Agarwal", "company": "LegalEase India", "role": "Managing Partner", "deal_size": "₹20L", "city": "Delhi"},
+    {"id": "p010", "name": "Sneha Pillai", "company": "TravelTech Solutions", "role": "Head of Product", "deal_size": "₹10L", "city": "Bangalore"},
+]
+
+DEMO_CALLS = [
+    {"prospect_idx": 0, "call_number": 1, "notes": "Requested a pilot program for 3 months before full commitment. VP Sales at TechCorp India, Bangalore.", "objections": ["Legal team needs to review data privacy clauses", "Currently evaluating Salesforce as alternative"], "outcome": "positive"},
+    {"prospect_idx": 0, "call_number": 2, "notes": "Asked about integration with their existing ERP system. Currently using legacy CRM, very frustrated.", "objections": ["IT team needs to review integration requirements"], "outcome": "positive"},
+    {"prospect_idx": 0, "call_number": 3, "notes": "Asked detailed questions about data security and GDPR compliance. Budget approved for Q3.", "objections": ["Had a failed CRM implementation with previous vendor", "Currently evaluating Salesforce as alternative"], "outcome": "needs follow-up"},
+    {"prospect_idx": 1, "call_number": 1, "notes": "Expressed strong interest in memory features. Currently using spreadsheets to track deals.", "objections": ["Board approval required for deals above ₹10L", "Comparing pricing with Zoho CRM"], "outcome": "positive"},
+    {"prospect_idx": 1, "call_number": 2, "notes": "CFO joined the call unexpectedly and asked about ROI timeline. Very receptive overall.", "objections": ["IT team needs to review integration requirements"], "outcome": "positive"},
+    {"prospect_idx": 1, "call_number": 3, "notes": "Requested case study from a company in same industry vertical. Decision by end of month.", "objections": ["Need reference customers in same industry"], "outcome": "positive"},
+    {"prospect_idx": 2, "call_number": 1, "notes": "Frustrated with current CRM. Says it takes too long to get insights.", "objections": ["Budget needs CFO approval before Q3 ends", "Team not ready for change management"], "outcome": "positive"},
+    {"prospect_idx": 2, "call_number": 2, "notes": "Had a demo with competitor last week. Said our UI is better.", "objections": ["Need reference customers in same industry"], "outcome": "positive"},
+    {"prospect_idx": 2, "call_number": 3, "notes": "Mentioned board meeting next month. Wants proposal ready before that.", "objections": ["Budget needs CFO approval before Q3 ends"], "outcome": "needs follow-up"},
+    {"prospect_idx": 3, "call_number": 1, "notes": "Positive call — asked for security whitepaper and compliance docs. Head of Operations at HealthPlus India.", "objections": ["Board approval required for deals above ₹10L", "Budget needs CFO approval before Q3 ends"], "outcome": "positive"},
+    {"prospect_idx": 3, "call_number": 2, "notes": "Raised concerns about data migration timeline from their legacy system.", "objections": ["Board approval required for deals above ₹10L", "Budget needs CFO approval before Q3 ends"], "outcome": "positive"},
+    {"prospect_idx": 3, "call_number": 3, "notes": "Requested a pilot program for 3 months before full commitment.", "objections": ["Legal team needs to review data privacy clauses", "Budget needs CFO approval before Q3 ends"], "outcome": "positive"},
+    {"prospect_idx": 3, "call_number": 4, "notes": "Requested case study from a company in same industry vertical.", "objections": ["Board approval required for deals above ₹10L"], "outcome": "positive"},
+    {"prospect_idx": 3, "call_number": 5, "notes": "Very positive about the AI features. Wants to see memory demo again.", "objections": ["Budget needs CFO approval before Q3 ends", "Board approval required for deals above ₹10L"], "outcome": "needs follow-up"},
+    {"prospect_idx": 4, "call_number": 1, "notes": "Board approval required for deals. Previously locked into 3-year contract with old vendor.", "objections": ["Board approval required for deals above ₹10L", "Previous vendor locked them into 3-year contract"], "outcome": "positive"},
+    {"prospect_idx": 4, "call_number": 2, "notes": "Currently evaluating Salesforce as alternative. Had failed CRM implementation before.", "objections": ["Currently evaluating Salesforce as alternative", "Had a failed CRM implementation with previous vendor"], "outcome": "positive"},
+    {"prospect_idx": 4, "call_number": 3, "notes": "Asked about data migration support. Team of 20 sales reps needs better visibility.", "objections": ["Data migration from legacy system is a blocker"], "outcome": "needs follow-up"},
+    {"prospect_idx": 4, "call_number": 4, "notes": "Positive about AI features. Wants security compliance docs before next meeting.", "objections": ["Security compliance documentation needed before signing"], "outcome": "positive"},
+    {"prospect_idx": 4, "call_number": 5, "notes": "Final evaluation stage. Comparing us with Salesforce on price.", "objections": ["Currently evaluating Salesforce as alternative"], "outcome": "needs follow-up"},
+    {"prospect_idx": 5, "call_number": 1, "notes": "Concerned about implementation timeline. Previous vendor locked into 3-year contract.", "objections": ["Concerned about implementation timeline", "Previous vendor locked them into 3-year contract"], "outcome": "positive"},
+    {"prospect_idx": 5, "call_number": 2, "notes": "Data migration from legacy system is a major blocker. IT team reviewing.", "objections": ["Data migration from legacy system is a blocker"], "outcome": "needs follow-up"},
+    {"prospect_idx": 5, "call_number": 3, "notes": "Need reference customers in same retail industry before signing.", "objections": ["Need reference customers in same industry"], "outcome": "positive"},
+    {"prospect_idx": 5, "call_number": 4, "notes": "Very positive call. Director IT confirmed budget is approved.", "objections": ["Concerned about implementation timeline"], "outcome": "positive"},
+    {"prospect_idx": 5, "call_number": 5, "notes": "Legal team reviewing data privacy clauses. Expected sign-off next week.", "objections": ["Legal team needs to review data privacy clauses"], "outcome": "positive"},
+    {"prospect_idx": 5, "call_number": 6, "notes": "Deal almost closed. Final legal sign-off pending.", "objections": [], "outcome": "positive"},
+    {"prospect_idx": 6, "call_number": 1, "notes": "Comparing pricing with Zoho CRM. Previous vendor locked them in for 3 years.", "objections": ["Comparing pricing with Zoho CRM", "Previous vendor locked them into 3-year contract"], "outcome": "needs follow-up"},
+    {"prospect_idx": 6, "call_number": 2, "notes": "Team not ready for change management. COO wants phased rollout.", "objections": ["Team not ready for change management"], "outcome": "neutral"},
+    {"prospect_idx": 6, "call_number": 3, "notes": "Requested ROI proof with case studies from manufacturing sector.", "objections": ["Need ROI proof with case studies from similar companies"], "outcome": "positive"},
+    {"prospect_idx": 6, "call_number": 4, "notes": "Budget discussion — ₹35L approved if ROI proof is satisfactory.", "objections": ["Comparing pricing with Zoho CRM"], "outcome": "positive"},
+    {"prospect_idx": 6, "call_number": 5, "notes": "Positive outcome. COO confirmed phased rollout plan works for them.", "objections": [], "outcome": "positive"},
+    {"prospect_idx": 7, "call_number": 1, "notes": "Budget needs CFO approval. Currently evaluating Salesforce as alternative.", "objections": ["Budget needs CFO approval before Q3 ends", "Currently evaluating Salesforce as alternative"], "outcome": "positive"},
+    {"prospect_idx": 7, "call_number": 2, "notes": "Security compliance documentation needed before signing. VP Technology confirmed.", "objections": ["Security compliance documentation needed before signing"], "outcome": "needs follow-up"},
+    {"prospect_idx": 7, "call_number": 3, "notes": "Positive call. Shared security whitepaper. CFO approval expected next week.", "objections": ["Budget needs CFO approval before Q3 ends"], "outcome": "positive"},
+    {"prospect_idx": 7, "call_number": 4, "notes": "CFO approved budget. Moving to contract stage.", "objections": [], "outcome": "positive"},
+    {"prospect_idx": 8, "call_number": 1, "notes": "Need reference customers in legal industry. Previous vendor locked them in.", "objections": ["Need reference customers in same industry", "Previous vendor locked them into 3-year contract"], "outcome": "needs follow-up"},
+    {"prospect_idx": 8, "call_number": 2, "notes": "ROI proof needed with case studies from legal sector.", "objections": ["Need ROI proof with case studies from similar companies"], "outcome": "positive"},
+    {"prospect_idx": 8, "call_number": 3, "notes": "Shared legal sector case study. Managing Partner very impressed.", "objections": ["Need reference customers in same industry"], "outcome": "positive"},
+    {"prospect_idx": 8, "call_number": 4, "notes": "Contract review stage. Legal team reviewing terms.", "objections": ["Legal team needs to review data privacy clauses"], "outcome": "positive"},
+    {"prospect_idx": 9, "call_number": 1, "notes": "Q4 budget already allocated. Comparing with Zoho CRM on price.", "objections": ["Q4 budget already allocated elsewhere", "Comparing pricing with Zoho CRM"], "outcome": "needs follow-up"},
+    {"prospect_idx": 9, "call_number": 2, "notes": "Security compliance documentation needed. Head of Product confirmed requirements.", "objections": ["Security compliance documentation needed before signing"], "outcome": "positive"},
+    {"prospect_idx": 9, "call_number": 3, "notes": "Budget discussion for Q1 next year. Very positive about AI features.", "objections": ["Q4 budget already allocated elsewhere"], "outcome": "positive"},
+    {"prospect_idx": 9, "call_number": 4, "notes": "Q1 budget confirmed. Moving forward with implementation planning.", "objections": [], "outcome": "positive"},
+    {"prospect_idx": 9, "call_number": 5, "notes": "Final call before contract. All objections resolved.", "objections": [], "outcome": "positive"},
+]
+
+def auto_seed():
+    for call_data in DEMO_CALLS:
+        p = DEMO_PROSPECTS[call_data["prospect_idx"]]
+        pid = p["id"]
+        if pid not in local_memory:
+            local_memory[pid] = []
+        local_memory[pid].append({
+            "prospect_name": p["name"],
+            "company": p["company"],
+            "deal_size": p["deal_size"],
+            "call_number": call_data["call_number"],
+            "notes": call_data["notes"],
+            "objections": call_data["objections"],
+            "outcome": call_data["outcome"],
+            "timestamp": datetime.now().isoformat()
+        })
+
+auto_seed()
+print(f"✅ Auto-seeded {len(DEMO_PROSPECTS)} prospects with {len(DEMO_CALLS)} calls on startup")
 # ── Models ──────────────────────────────────────────────
 class CallNote(BaseModel):
     prospect_id: str
