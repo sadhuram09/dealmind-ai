@@ -13,7 +13,7 @@ from datetime import datetime
 
 load_dotenv()
 
-app = FastAPI(title="DealMind AI", version="4.0.0")
+app = FastAPI(title="DealMind AI", version="4.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +29,7 @@ HINDSIGHT_BASE = "https://api.hindsight.vectorize.io/v1/default"
 
 # ── In-memory store (fast access) ────────────────────────
 local_memory: Dict[str, List[dict]] = {}
-prospect_metadata: Dict[str, dict] = {}  # permanent metadata store
+prospect_metadata: Dict[str, dict] = {}
 audit_log: List[dict] = []
 
 # ── Models ──────────────────────────────────────────────
@@ -82,36 +82,50 @@ def hindsight_store(bank_id: str, content: str):
         return False
 
 def hindsight_store_metadata(bank_id: str, metadata: dict):
-    """Store prospect metadata as a mental model in Hindsight — permanent"""
+    """Store prospect metadata as a memory in Hindsight — permanent"""
     try:
-        content = json.dumps(metadata)
+        content = (
+            f"PROSPECT_METADATA: "
+            f"name={metadata.get('prospect_name', '')}, "
+            f"company={metadata.get('company', '')}, "
+            f"deal_size={metadata.get('deal_size', '')}, "
+            f"outcome={metadata.get('last_outcome', '')}"
+        )
         http_requests.post(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}/mental-models",
-            json={
-                "id": "prospect_metadata",
-                "name": f"Prospect Profile - {metadata.get('prospect_name', '')}",
-                "source_query": "prospect metadata name company deal size outcome",
-                "content": content,
-                "description": "Prospect structured metadata — name, company, deal size, outcomes"
-            },
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories",
+            json={"items": [{"content": content}]},
             headers=get_hindsight_headers(),
             timeout=5
         )
     except:
         pass
 
-def hindsight_get_metadata(bank_id: str) -> dict:
-    """Retrieve prospect metadata from Hindsight mental model"""
+def hindsight_recall_metadata(bank_id: str) -> dict:
+    """Retrieve prospect metadata from Hindsight memory"""
     try:
-        r = http_requests.get(
-            f"{HINDSIGHT_BASE}/banks/{bank_id}/mental-models/prospect_metadata",
+        r = http_requests.post(
+            f"{HINDSIGHT_BASE}/banks/{bank_id}/memories/recall",
+            json={"query": "PROSPECT_METADATA name company deal size outcome", "top_k": 1},
             headers=get_hindsight_headers(),
             timeout=5
         )
         if r.status_code == 200:
-            data = r.json()
-            content = data.get("content", "{}")
-            return json.loads(content)
+            results = r.json().get("results", [])
+            if results:
+                text = results[0].get("text", "")
+                if "PROSPECT_METADATA:" in text:
+                    meta = {}
+                    parts = text.replace("PROSPECT_METADATA: ", "").split(", ")
+                    for part in parts:
+                        if "=" in part:
+                            key, val = part.split("=", 1)
+                            meta[key.strip()] = val.strip()
+                    return {
+                        "prospect_name": meta.get("name", ""),
+                        "company": meta.get("company", ""),
+                        "deal_size": meta.get("deal_size", ""),
+                        "last_outcome": meta.get("outcome", "")
+                    }
     except:
         pass
     return {}
@@ -278,7 +292,6 @@ def auto_seed():
             "outcome": call_data["outcome"],
             "timestamp": datetime.now().isoformat()
         })
-        # Store metadata permanently
         prospect_metadata[pid] = {
             "prospect_id": pid,
             "prospect_name": p["name"],
@@ -332,7 +345,7 @@ def ask_groq(prompt: str, system: str = "You are an elite AI sales assistant.") 
 @app.get("/")
 def root():
     return {
-        "status": "DealMind AI v4.0 is live 🚀",
+        "status": "DealMind AI v4.1 is live 🚀",
         "memory_primary": "Hindsight Cloud (persistent semantic)",
         "memory_fallback": "Local store (always available)",
         "llm": "Groq llama-3.3-70b-versatile",
@@ -349,7 +362,7 @@ def health():
         )
         hs = "connected" if r.status_code == 200 else f"error-{r.status_code}"
     except Exception as e:
-        hs = f"disconnected"
+        hs = "disconnected"
     return {
         "status": "ok",
         "hindsight": hs,
@@ -372,7 +385,6 @@ def log_call(data: CallNote):
     hindsight_ensure_bank(bank_id, data.prospect_name, data.company, data.deal_size)
     hs_ok = hindsight_store(bank_id, content)
 
-    # Store metadata permanently in Hindsight
     meta = {
         "prospect_id": data.prospect_id,
         "prospect_name": data.prospect_name,
@@ -572,7 +584,6 @@ def get_audit_trail():
 
 @app.get("/prospects")
 def get_prospects():
-    # Build from local memory + prospect_metadata (auto-seeded on startup)
     prospects = []
 
     # First add all from local memory
@@ -607,9 +618,9 @@ def get_prospects():
             if bid.startswith("dealmind-"):
                 pid = bid.replace("dealmind-", "")
                 if pid not in local_ids:
-                    # Get metadata from Hindsight
-                    meta = hindsight_get_metadata(bid)
-                    if meta:
+                    # Recall metadata from Hindsight memory
+                    meta = hindsight_recall_metadata(bid)
+                    if meta and meta.get("prospect_name"):
                         prospects.append({
                             "prospect_id": pid,
                             "prospect_name": meta.get("prospect_name", pid),
@@ -619,8 +630,8 @@ def get_prospects():
                             "last_outcome": meta.get("last_outcome", "unknown"),
                             "all_objections": [],
                             "bank_id": bid,
-                            "role": meta.get("role", ""),
-                            "city": meta.get("city", "")
+                            "role": "",
+                            "city": ""
                         })
     except:
         pass
