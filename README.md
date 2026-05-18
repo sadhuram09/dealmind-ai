@@ -11,17 +11,6 @@ DealMind AI is an enterprise-grade sales intelligence platform that ensures sale
 
 ---
 
-## 🎬 3-Minute Video Demo Script
-This script has been meticulously crafted to meet the exact video criteria (Part 3 of the submission guidelines). It **strictly avoids** the word *"hackathon"* to prevent any risk of disqualification.
-
-> **Video Format Guidelines Met:**
-> - **Length:** ~3 minutes (perfectly within the 2–5 min target)
-> - **Resolution:** 1080p minimum
-> - **Style:** Screen recording with voiceover (clear, pacing-focused narration)
-
-[👉 View Standalone Demo Script Document](file:///c:/Users/AMAN%20SHEKHAR/OneDrive/Desktop/microhack/dealmind-ai/DEMO_SCRIPT.md)
-
----
 
 ## 💡 The Problem
 In modern B2B sales, reps typically balance **30 to 50 active deals** concurrently. Prospect interactions happen across weeks or months. Reps inevitably forget critical details—like an integration objection raised on a call 20 days ago, or a specific compliance requirement requested by a CTO. 
