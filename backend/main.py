@@ -88,6 +88,8 @@ def hindsight_store_metadata(bank_id: str, metadata: dict):
             f"{HINDSIGHT_BASE}/banks/{bank_id}/mental-models",
             json={
                 "id": "prospect_metadata",
+                "name": f"Prospect Profile - {metadata.get('prospect_name', '')}",
+                "source_query": "prospect metadata name company deal size outcome",
                 "content": content,
                 "description": "Prospect structured metadata — name, company, deal size, outcomes"
             },
