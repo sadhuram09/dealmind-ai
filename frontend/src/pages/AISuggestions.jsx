@@ -97,8 +97,8 @@ export default function AISuggestions() {
     if (!emailProspect) return;
     setEmailLoading(true); setEmail(null);
     try {
-      const r = await draftFollowup({ prospect_id: emailProspect, context: emailContext });
-      setEmail(r.data.email);
+      const r = await draftFollowup({ prospect_id: emailProspect, call_summary: emailContext });
+      setEmail(r.data.text || r.data.email);
       setEmailModal(true);
       addNotification(`Follow-up email drafted for ${prospects.find(p=>p.prospect_id===emailProspect)?.prospect_name}`, 'mail');
     } catch { setEmail('Failed to draft email. Check backend connection.'); }

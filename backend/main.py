@@ -45,7 +45,8 @@ class CallNote(BaseModel):
 
 class FollowUpRequest(BaseModel):
     prospect_id: str
-    call_summary: str
+    call_summary: Optional[str] = None
+    context: Optional[str] = None
 
 # ── Hindsight Cloud helpers ──────────────────────────────
 def get_hindsight_headers():
@@ -464,6 +465,8 @@ def draft_followup(data: FollowUpRequest):
         "past conversations objections personal details commitments promises"
     )
 
+    summary = data.call_summary or data.context or ""
+
     prompt = f"""
 You are an expert sales rep writing a follow-up email.
 
@@ -471,7 +474,7 @@ Relationship intelligence:
 {memory}
 
 Today's call summary:
-{data.call_summary}
+{summary}
 
 Write a follow-up email that:
 1. References something specific from a PAST call — make it obvious you remembered
@@ -485,7 +488,10 @@ Subject: [subject line]
 
 [email body]
 """
-    return ask_groq(prompt)
+    res = ask_groq(prompt)
+    if "text" in res:
+        res["email"] = res["text"]
+    return res
 
 @app.get("/deal-risk/{prospect_id}")
 def deal_risk(prospect_id: str):
